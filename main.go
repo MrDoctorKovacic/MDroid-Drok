@@ -34,15 +34,23 @@ func main() {
 	}
 
 	for {
-		voltage, ok := readValue("voltage")
-		if ok {
+		voltage, vok := readValue("voltage")
+		if vok {
 			//fmt.Println(voltage)
 			postValue(fmt.Sprintf("%f", voltage), "AUX_VOLTAGE_OUTPUT")
 		}
 
-		current, ok := readValue("current")
-		if ok {
-			//fmt.Println(current)
+		current, cok := readValue("current")
+		if cok {
+			// Increase voltage at load
+			if vok {
+				if current >= 2 && voltage == 5.24 {
+					drok.SetVoltage(drokPort, 5.35)
+				} else if current < 2 && voltage == 5.35 {
+					drok.SetVoltage(drokPort, 5.24)
+				}
+			}
+
 			postValue(fmt.Sprintf("%f", current), "AUX_CURRENT")
 		}
 
