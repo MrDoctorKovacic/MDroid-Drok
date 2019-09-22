@@ -80,7 +80,9 @@ func postValue(value string, valueType string) {
 	resp, err := client.Do(req)
 	if err != nil {
 		MainStatus.Log(logging.Error(), err.Error())
+		return
 	}
+	MainStatus.Log(logging.OK(), fmt.Sprintf("Successfully posted %s to %s", valueType, mdroidHost))
 	defer resp.Body.Close()
 }
 
