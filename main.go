@@ -34,13 +34,13 @@ func main() {
 		voltage, ok := readValue("voltage")
 		if ok {
 			//fmt.Println(voltage)
-			postValue(fmt.Sprintf("%f", voltage), "current")
+			postValue(fmt.Sprintf("%f", voltage), "AUX_VOLTAGE_OUTPUT")
 		}
 
 		current, ok := readValue("current")
 		if ok {
 			//fmt.Println(current)
-			postValue(fmt.Sprintf("%f", current), "current")
+			postValue(fmt.Sprintf("%f", current), "AUX_CURRENT")
 		}
 
 		time.Sleep(time.Second * 10)
