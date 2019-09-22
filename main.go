@@ -33,13 +33,13 @@ func main() {
 	for {
 		voltage, ok := readValue("voltage")
 		if ok {
-			fmt.Println(voltage)
+			//fmt.Println(voltage)
 			postValue(fmt.Sprintf("%f", voltage), "current")
 		}
 
 		current, ok := readValue("current")
 		if ok {
-			fmt.Println(current)
+			//fmt.Println(current)
 			postValue(fmt.Sprintf("%f", current), "current")
 		}
 
@@ -69,7 +69,7 @@ func readValue(valueName string) (float32, bool) {
 }
 
 func postValue(value string, valueType string) {
-	jsonStr := []byte(fmt.Sprintf(`{"value":%s}`, value))
+	jsonStr := []byte(fmt.Sprintf(`{"value":"%s"}`, value))
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/session/%s", mdroidHost, valueType), bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 
