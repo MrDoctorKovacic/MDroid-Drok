@@ -6,7 +6,6 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/MrDoctorKovacic/MDroid-Core/logging"
@@ -28,7 +27,11 @@ var (
 
 func main() {
 
-	config()
+	// Repeatedly run config, to ensure serial device is grabbed
+	cok := config()
+	for !cok {
+		cok = config()
+	}
 
 	for {
 		voltage, ok := readValue("voltage")
@@ -81,7 +84,7 @@ func postValue(value string, valueType string) {
 	defer resp.Body.Close()
 }
 
-func config() {
+func config() bool {
 	flag.StringVar(&settingsFile, "settings-file", "", "File to recover the persistent settings.")
 	flag.Parse()
 
@@ -91,7 +94,8 @@ func config() {
 	// Log settings
 	out, err := json.Marshal(settingsData)
 	if err != nil {
-		panic(err)
+		MainStatus.Log(logging.Error(), err.Error())
+		return false
 	}
 	MainStatus.Log(logging.OK(), "Using settings: "+string(out))
 
@@ -102,7 +106,7 @@ func config() {
 		drokAddressString, usingdrok := config["DROK_DEVICE"]
 		if !usingdrok {
 			MainStatus.Log(logging.Error(), "Drok address not found in settings file")
-			os.Exit(3)
+			return false
 		}
 		drokAddress = drokAddressString
 
@@ -110,7 +114,7 @@ func config() {
 		mdroidAddress, usingMDroid := config["MDROID_HOST"]
 		if !usingMDroid {
 			MainStatus.Log(logging.Error(), "MDroid address not found in settings file")
-			os.Exit(3)
+			return false
 		}
 		mdroidHost = mdroidAddress
 	} else {
@@ -120,6 +124,10 @@ func config() {
 	c := &serial.Config{Name: drokAddress, Baud: 4800}
 	drokPort, err = serial.OpenPort(c)
 	if err != nil {
-		panic("Failed to open serial port")
+		MainStatus.Log(logging.Error(), "No config found in settings file, not parsing through config")
+		time.Sleep(time.Second * 10)
+		MainStatus.Log(logging.Warning(), "Trying to config again...")
+		return false
 	}
+	return true
 }
