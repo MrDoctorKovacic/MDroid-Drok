@@ -45,8 +45,8 @@ func main() {
 			// Increase voltage at load
 			if vok {
 				if current >= 2 && voltage == 5.24 {
-					drok.SetVoltage(drokPort, 5.35)
-				} else if current < 2 && voltage == 5.35 {
+					drok.SetVoltage(drokPort, 5.45)
+				} else if current < 2 && voltage == 5.45 {
 					drok.SetVoltage(drokPort, 5.24)
 				}
 			}
