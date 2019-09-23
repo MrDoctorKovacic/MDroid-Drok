@@ -80,7 +80,7 @@ func readValue(valueName string) (float32, bool) {
 }
 
 func postValue(value string, valueType string) {
-	jsonStr := []byte(fmt.Sprintf(`{"value":"%s"}`, value))
+	jsonStr := []byte(fmt.Sprintf(`{"quiet": true, "value":"%s"}`, value))
 	req, err := http.NewRequest("POST", fmt.Sprintf("%s/session/%s", mdroidHost, valueType), bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 
