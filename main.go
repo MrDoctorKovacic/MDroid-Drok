@@ -40,8 +40,8 @@ func main() {
 			postValue(fmt.Sprintf("%f", voltage), "AUX_VOLTAGE_OUTPUT")
 		}
 
-		current, cok := readValue("current")
-		if cok {
+		current, aok := readValue("current")
+		if aok {
 			// Increase voltage at load
 			if vok {
 				if current >= 2 && voltage == 5.24 {
@@ -90,7 +90,6 @@ func postValue(value string, valueType string) {
 		MainStatus.Log(logging.Error(), err.Error())
 		return
 	}
-	//MainStatus.Log(logging.OK(), fmt.Sprintf("Successfully posted %s to %s", valueType, mdroidHost))
 	defer resp.Body.Close()
 }
 
