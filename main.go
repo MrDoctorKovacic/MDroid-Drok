@@ -51,7 +51,7 @@ func main() {
 				}
 			}
 
-			postValue(fmt.Sprintf("%f", current), "AUX_CURRENT")
+			postValue(fmt.Sprintf("%f", current), "AUX_CURRENT_RAW")
 		}
 
 		time.Sleep(time.Second * 10)
