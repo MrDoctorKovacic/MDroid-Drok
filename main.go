@@ -8,14 +8,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/MrDoctorKovacic/MDroid-Core/logging"
 	"github.com/MrDoctorKovacic/MDroid-Core/settings"
 	drok "github.com/MrDoctorKovacic/drok"
+	"github.com/rs/zerolog/log"
 	"github.com/tarm/serial"
 )
-
-// MainStatus will control logging and reporting of status / warnings / errors
-var MainStatus = logging.NewStatus("Main")
 
 // Start with program arguments
 var (
@@ -64,14 +61,14 @@ func readValue(valueName string) (float32, bool) {
 		// Read output current
 		current, err := drok.ReadCurrent(drokPort)
 		if err != nil {
-			MainStatus.Log(logging.Error(), fmt.Sprintf("Error reading current: \n%s", err.Error()))
+			log.Error().Msg(fmt.Sprintf("Error reading current: \n%s", err.Error()))
 		}
 		return current, true
 	case "voltage":
 		// Read output voltage
 		voltage, err := drok.ReadVoltage(drokPort)
 		if err != nil {
-			MainStatus.Log(logging.Error(), fmt.Sprintf("Error reading voltage: \n%s", err.Error()))
+			log.Error().Msg(fmt.Sprintf("Error reading voltage: \n%s", err.Error()))
 		}
 		return voltage, true
 	}
@@ -87,7 +84,7 @@ func postValue(value string, valueType string) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		MainStatus.Log(logging.Error(), err.Error())
+		log.Error().Msg(err.Error())
 		return
 	}
 	defer resp.Body.Close()
@@ -103,10 +100,10 @@ func config() bool {
 	// Log settings
 	out, err := json.Marshal(settingsData)
 	if err != nil {
-		MainStatus.Log(logging.Error(), err.Error())
+		log.Error().Msg(err.Error())
 		return false
 	}
-	MainStatus.Log(logging.OK(), "Using settings: "+string(out))
+	log.Info().Msg("Using settings: " + string(out))
 
 	// Parse through config if found in settings file
 	config, ok := settingsData["MDROID"]
@@ -114,7 +111,7 @@ func config() bool {
 		// Set up drok
 		drokAddressString, usingdrok := config["DROK_DEVICE"]
 		if !usingdrok {
-			MainStatus.Log(logging.Error(), "Drok address not found in settings file")
+			log.Error().Msg("Drok address not found in settings file")
 			return false
 		}
 		drokAddress = drokAddressString
@@ -122,20 +119,20 @@ func config() bool {
 		// Set up drok
 		mdroidAddress, usingMDroid := config["MDROID_HOST"]
 		if !usingMDroid {
-			MainStatus.Log(logging.Error(), "MDroid address not found in settings file")
+			log.Error().Msg("MDroid address not found in settings file")
 			return false
 		}
 		mdroidHost = mdroidAddress
 	} else {
-		MainStatus.Log(logging.Error(), "No config found in settings file, not parsing through config")
+		log.Error().Msg("No config found in settings file, not parsing through config")
 	}
 
 	c := &serial.Config{Name: drokAddress, Baud: 4800}
 	drokPort, err = serial.OpenPort(c)
 	if err != nil {
-		MainStatus.Log(logging.Error(), "No config found in settings file, not parsing through config")
+		log.Error().Msg("No config found in settings file, not parsing through config")
 		time.Sleep(time.Second * 10)
-		MainStatus.Log(logging.Warning(), "Trying to config again...")
+		log.Warn().Msg("Trying to config again...")
 		return false
 	}
 	return true
