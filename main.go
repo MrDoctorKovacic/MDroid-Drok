@@ -40,13 +40,14 @@ func main() {
 		current, aok := readValue("current")
 		if aok {
 			// Increase voltage at load
+			/* not needed anymore
 			if vok {
 				if current >= 2 && voltage < 5.4 {
 					drok.SetVoltage(drokPort, 5.45)
 				} else if current < 2 && voltage >= 5.4 {
 					drok.SetVoltage(drokPort, 5.24)
 				}
-			}
+			}*/
 
 			postValue(fmt.Sprintf("%f", current), "AUX_CURRENT_RAW")
 		}
